@@ -7,7 +7,6 @@ use crate::{
     BALL_WIDTH_HALF, PADDLE1_SIZE, PADDLE2_SIZE, PADDLE_HEIGHT_HALF, PADDLE_WIDTH_HALF, TIME_STEP,
 };
 use bevy::prelude::*;
-use bevy::sprite::collide_aabb::*;
 
 pub struct BallPlugin;
 pub struct BallRespawnEvent;
@@ -50,28 +49,6 @@ fn ball_movement_system(mut balls: Query<(&mut Transform, &Velocity), With<Ball>
     }
 }
 
-fn intersect_rect(
-    position1: Vec3,
-    shape1: (f32, f32),
-    position2: Vec3,
-    shape2: (f32, f32),
-) -> bool {
-    let x1_left = position1.x - shape1.0 * 0.5;
-    let x1_right = position1.x + shape1.0 * 0.5;
-    let x2_left = position2.x - shape2.0 * 0.5;
-    let x2_right = position2.x + shape2.0 * 0.5;
-
-    let intersect_x = x1_left < x2_right && x1_right > x2_left;
-
-    let y1_top = position1.y + shape1.1 * 0.5;
-    let y1_bottom = position1.y - shape1.1 * 0.5;
-    let y2_top = position2.y + shape2.1 * 0.5;
-    let y2_bottom = position2.y - shape2.1 * 0.5;
-
-    let intersect_y = y1_top > y2_bottom && y1_bottom < y2_top;
-
-    intersect_x && intersect_y
-}
 
 pub fn is_offscreen_top_bottom(point: Vec3) -> bool {
     let half_height = SCREEN_SIZE.y / 2.0;
@@ -91,6 +68,7 @@ pub fn is_offscreen_right(point: Vec3) -> bool {
     point.x > half_width
 }
 
+
 fn collide_paddle(
     mut ball: Query<
         (&mut Transform, &mut Velocity, &SpriteSize),
@@ -106,22 +84,13 @@ fn collide_paddle(
     let (mut ball_transform, mut ball_velocity, ball_size) = ball.single_mut();
     let (paddle1_transform, paddle1_size) = paddle1.single();
     let (paddle2_transform, paddle2_size) = paddle2.single();
+    let ball_rect = Rect::from_center_size(ball_transform.translation.truncate(), Vec2::new(BALL_SIZE.0, BALL_SIZE.1));
+    let paddle1_rect =  Rect::from_center_size(paddle1_transform.translation.truncate(), Vec2::new(PADDLE1_SIZEl.0, PADDLE1_SIZE.0);
+    let paddle2_rect = Rect::from_center_size(paddle2_transform.translation.truncate(), PADDLE2_SIZE);
 
-    if intersect_rect(
-        ball_transform.translation,
-        BALL_SIZE,
-        paddle1_transform.translation,
-        PADDLE1_SIZE,
-    ) {
-        ball_velocity.x = -ball_velocity.x;
-    }
 
-    if intersect_rect(
-        ball_transform.translation,
-        BALL_SIZE,
-        paddle2_transform.translation,
-        PADDLE2_SIZE,
-    ) {
+    if ball_rect.intersect(paddle1_rect) || ball_rect.intersect(paddle2_rect)
+    {
         ball_velocity.x = -ball_velocity.x;
     }
 }
