@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::math::Vec2;
 use bevy::sprite::collide_aabb::{collide, Collision};
 use bevy::sprite::SpriteBundle;
-use crate::{GameTextures, WinSize, TOP_WALL, BOTTOM_WALL, LEFT_WALL, RIGHT_WALL, WALL_THICKNESS, WALL_COLOR};
+use crate::{GameTextures, WinSize, WALL_THICKNESS, WALL_COLOR};
 use crate::Transform;
 
 use crate::paddle;
@@ -26,32 +26,20 @@ pub struct Velocity {
 pub struct Paddle1;
 
 #[derive(Component)]
-pub struct FromPaddle1;
-
-#[derive(Component)]
 pub struct Paddle2;
-
-#[derive(Component)]
-pub struct FromPaddle2;
 
 #[derive(Component)]
 pub struct Ball;
 
 #[derive(Component)]
-pub struct FromBall;
-
-#[derive(Component)]
-pub struct Wall;
-
-#[derive(Component)]
-pub struct FromWall;
-
-
-#[derive(Component)]
 pub struct SpriteSize(pub Vec2);
 
 #[derive(Component)]
-pub struct Collider;
+pub struct Collider; 
+
+pub struct GameData {
+    pub score: i32,
+}
 
 
 impl From<(f32, f32)> for SpriteSize {
